@@ -8,17 +8,21 @@ public class PlayerMovement : MonoBehaviour
     public float verticalInput;
 
 
-    void Start()
-    {
-        
-    }
-
     void Update()
     {
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
 
-        transform.Translate(Vector3.forward * Time.deltaTime * verticalInput);
-        transform.Translate(Vector3.right * Time.deltaTime * horizontalInput);
+        Vector3 moveDirection = (Camera.main.transform.forward * verticalInput + Camera.main.transform.right * horizontalInput).normalized;
+        moveDirection.y = 0;
+
+        transform.Translate(moveDirection * Time.deltaTime, Space.World);
+
+
+        // Rotate the player to face the movement direction
+        if (moveDirection != Vector3.zero)
+        {
+            transform.rotation = Quaternion.LookRotation(moveDirection);
+        }
     }
 }
