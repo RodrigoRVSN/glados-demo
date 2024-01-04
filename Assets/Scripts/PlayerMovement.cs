@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
     public float horizontalInput;
     public float verticalInput;
-
 
     void Update()
     {
@@ -18,8 +15,6 @@ public class PlayerMovement : MonoBehaviour
 
         transform.Translate(moveDirection * Time.deltaTime, Space.World);
 
-
-        // Rotate the player to face the movement direction
         if (moveDirection != Vector3.zero)
         {
             transform.rotation = Quaternion.LookRotation(moveDirection);
