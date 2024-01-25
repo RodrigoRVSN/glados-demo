@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -6,37 +7,38 @@ public class PlayerMovement : MonoBehaviour
     private Animator animator;
     private float defaultSpeed = 5f;
     private float runningMultiplier = 2f;
+    private bool isGrounded = true;
+    private CharacterController character;
+    private Vector3 moveDirection;
+    private Vector3 velocity;
 
-    void Start ()
+    void Start()
     {
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         animator = GetComponent<Animator>();
-    }
-
-    float GetSpeed()
-    {
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            return defaultSpeed * runningMultiplier;
-        }
-
-        return defaultSpeed;
+        character = GetComponent<CharacterController>();
     }
 
     void Update()
     {
+        Move();
+        ApplyGravity();
+        ApplyJump();
+    }
+
+    void Move()
+    {
         animator.SetBool("isMoving", false);
         animator.SetBool("isRunning", false);
+
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
-        float moveSpeed = GetSpeed();
+        float moveSpeed = Input.GetKey(KeyCode.LeftShift) ? defaultSpeed * runningMultiplier : defaultSpeed;
 
-        Vector3 moveDirection = (Camera.main.transform.forward * verticalInput + Camera.main.transform.right * horizontalInput).normalized;
+        moveDirection = (Camera.main.transform.forward * verticalInput + Camera.main.transform.right * horizontalInput).normalized;
         moveDirection.y = 0;
-
-        transform.Translate(moveDirection * Time.deltaTime * moveSpeed, Space.World);
-
+        character.Move(moveDirection * moveSpeed * Time.deltaTime);
 
         if (moveDirection != Vector3.zero)
         {
@@ -45,9 +47,33 @@ public class PlayerMovement : MonoBehaviour
             {
                 animator.SetBool("isRunning", true);
             }
-
-            Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-            transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+            ApplyRotation();
         }
     }
+
+    void ApplyGravity()
+    {
+        velocity.y += Physics.gravity.y * Time.deltaTime;
+        character.Move(velocity * Time.deltaTime);
+        isGrounded = character.isGrounded;
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = -1f;
+        }
+    }
+
+    void ApplyJump()
+    {
+        if (Input.GetButtonDown("Jump") && isGrounded)
+        {
+            velocity.y = 8f;
+        }
+    }
+
+    void ApplyRotation ()
+    {
+        Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+        transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+    }
+
 }
