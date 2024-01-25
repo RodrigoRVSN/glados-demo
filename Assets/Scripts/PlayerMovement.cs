@@ -58,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
         isGrounded = character.isGrounded;
         if (isGrounded && velocity.y < 0)
         {
+            animator.SetBool("isJumping", false);
             velocity.y = -1f;
         }
     }
@@ -66,7 +67,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            velocity.y = 8f;
+            animator.SetBool("isJumping", true);
+            velocity.y = 5f;
         }
     }
 

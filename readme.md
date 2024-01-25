@@ -1,7 +1,7 @@
 # Todo:
 
-- [] Fix physics
-- [] Add jump
-- [] Add assets
-- [] Add animation
-- [] Manage NPC by script and triggers
+- [x] Fix physics
+- [x] Add jump
+- [ ] Add assets
+- [x] Add animation
+- [ ] Manage NPC by script and triggers
